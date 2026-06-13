@@ -1,19 +1,18 @@
-# Genesis Roadmap
+## Phase 0 - Backend Foundation
 
-## Phase 1 - Tokenization
-
-Status: Planned
-
-Goal:
-Understand how text becomes tokens.
+Status: Completed
 
 Topics:
-- Vocabulary
-- Encoding
-- Decoding
-- BPE
+- Project structure
+- FastAPI
+- Routing
+- Lifespan
+- Logging
+- OpenTelemetry
+- Health checks
 
 Deliverables:
-- Basic tokenizer
-- Encode
-- Decode
+- Running HTTP API
+- Health endpoint
+- Startup/shutdown lifecycle
+- Telemetry foundation

@@ -1,0 +1,6 @@
+pytest
+FastAPI
+uvicorn[standard]
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-instrumentation-fastapi
