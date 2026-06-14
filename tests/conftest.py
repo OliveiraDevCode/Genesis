@@ -5,11 +5,6 @@ from application.interfaces.telemetry import TelemetryPort
 
 @dataclass
 class FakeTelemetryService(TelemetryPort):
-    """In-memory fake for TelemetryPort.
-
-    Records all events and exceptions for assertion in tests.
-    No OpenTelemetry dependency — fast and deterministic.
-    """
 
     events: list[dict] = field(default_factory=list)
     exceptions: list[dict] = field(default_factory=list)

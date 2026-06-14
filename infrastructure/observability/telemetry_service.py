@@ -4,12 +4,6 @@ from application.interfaces.telemetry import TelemetryPort
 
 
 class TelemetryService(TelemetryPort):
-    """OpenTelemetry-based telemetry service.
-
-    Receives a pre-configured Tracer via constructor injection.
-    Does NOT read environment variables or set global state.
-    The TracerProvider must be configured before constructing this service.
-    """
 
     def __init__(self, tracer: trace.Tracer) -> None:
         self._tracer = tracer

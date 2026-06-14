@@ -12,7 +12,6 @@ async def health(
     use_case: HealthCheckUseCase = Depends(get_health_use_case),
     settings: Settings = Depends(get_settings),
 ):
-    """Returns the current health status of the application."""
     result = use_case.execute()
     result["service"] = settings.service_name
     result["environment"] = settings.environment

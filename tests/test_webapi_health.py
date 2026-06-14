@@ -5,15 +5,9 @@ from application.use_cases.health import HealthCheckUseCase
 from tests.conftest import FakeTelemetryService
 from webapi.container import Container
 from webapi.routes import routers
-from webapi.settings import Settings
 
 
 def _build_test_app(telemetry: FakeTelemetryService | None = None) -> FastAPI:
-    """Build a minimal FastAPI app for integration testing.
-
-    Uses a pre-wired Container but lets callers inject a FakeTelemetryService
-    so that tests can assert on telemetry events.
-    """
     container = Container.create()
 
     if telemetry is not None:
@@ -70,19 +64,16 @@ def test_health_endpoint_uses_telemetry():
 
 
 def test_health_route_is_registered():
-    """Verify /health appears in the URL table."""
     app = _build_test_app()
     paths = _collect_route_paths(app.router)
     assert "/health" in paths
 
 
 def _collect_route_paths(router) -> set:
-    """Recursively collect path strings from a router and its sub-routers."""
     paths = set()
     for route in router.routes:
         if hasattr(route, "path"):
             paths.add(route.path)
-        # _IncludedRouter wraps the original APIRouter in .original_router
         if hasattr(route, "original_router"):
             paths.update(_collect_route_paths(route.original_router))
     return paths

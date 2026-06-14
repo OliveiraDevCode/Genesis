@@ -1,4 +1,3 @@
-from application.constants.events import TelemetryEvents
 from application.use_cases.health import HealthCheckUseCase
 from tests.conftest import FakeTelemetryService
 
@@ -23,7 +22,6 @@ def test_health_check_tracks_event():
 
 
 def test_health_use_case_accepts_fake_telemetry():
-    """Verifies the port/interface boundary works correctly."""
     telemetry = FakeTelemetryService()
     use_case = HealthCheckUseCase(telemetry=telemetry)
 

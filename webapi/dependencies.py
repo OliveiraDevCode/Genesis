@@ -4,13 +4,6 @@ from application.use_cases.health import HealthCheckUseCase
 from infrastructure.observability.telemetry_service import TelemetryService
 from webapi.settings import Settings
 
-"""FastAPI dependency-injection functions.
-
-Each function extracts a pre-wired dependency from app.state.
-These are the only places where app.state is accessed for DI.
-Routes declare their dependencies explicitly via Depends().
-"""
-
 
 def get_telemetry_service(request: Request) -> TelemetryService:
     return request.app.state.telemetry_service

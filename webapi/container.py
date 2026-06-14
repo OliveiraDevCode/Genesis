@@ -1,5 +1,8 @@
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
+from logging import getLogger
+
+logger = getLogger(__name__)
 
 from fastapi import FastAPI
 from opentelemetry import trace
@@ -15,35 +18,14 @@ from webapi.settings import Settings
 
 @dataclass(frozen=True)
 class Container:
-    """Application composition root.
-
-    Wires all dependencies explicitly. Created once at startup and frozen.
-    This is the only place where infrastructure and application objects
-    are constructed and wired together.
-    """
-
     settings: Settings
     telemetry_service: TelemetryService
     health_use_case: HealthCheckUseCase
 
-    # ------------------------------------------------------------------
-    # Factory
-    # ------------------------------------------------------------------
-
     @classmethod
     def create(cls) -> "Container":
-        """Build the fully-wired application from scratch.
-
-        Call order:
-          1. Settings  (configuration)
-          2. Tracer    (observability infrastructure)
-          3. Services  (application services that depend on infrastructure)
-          4. Use cases (application use cases that depend on services)
-        """
         settings = Settings.load()
-
         tracer = cls._create_tracer(settings)
-
         telemetry_service = TelemetryService(tracer=tracer)
         health_use_case = HealthCheckUseCase(telemetry=telemetry_service)
 
@@ -53,13 +35,8 @@ class Container:
             health_use_case=health_use_case,
         )
 
-    # ------------------------------------------------------------------
-    # Lifecycle
-    # ------------------------------------------------------------------
-
     @asynccontextmanager
     async def lifespan(self, app: FastAPI):
-        """FastAPI lifespan handler — manages startup and shutdown."""
         self._startup()
         yield
         self._shutdown()
@@ -73,18 +50,8 @@ class Container:
         finally:
             self.telemetry_service.shutdown()
 
-    # ------------------------------------------------------------------
-    # Private helpers
-    # ------------------------------------------------------------------
-
     @staticmethod
     def _create_tracer(settings: Settings) -> trace.Tracer:
-        """Create and configure the OpenTelemetry tracer provider.
-
-        The provider is registered globally ONCE here so that
-        FastAPI instrumentation can find it. No other code should
-        call trace.set_tracer_provider().
-        """
         resource = Resource.create(
             {
                 "service.name": settings.service_name,
@@ -99,5 +66,17 @@ class Container:
                 SimpleSpanProcessor(ConsoleSpanExporter())
             )
 
-        trace.set_tracer_provider(provider)
+        _set_global_provider_once(provider)
         return trace.get_tracer(settings.service_name)
+
+
+_tracer_provider_set = False
+
+
+def _set_global_provider_once(provider: TracerProvider) -> None:
+    global _tracer_provider_set
+    if not _tracer_provider_set:
+        trace.set_tracer_provider(provider)
+        _tracer_provider_set = True
+    else:
+        logger.debug("TracerProvider already set globally — skipping")
