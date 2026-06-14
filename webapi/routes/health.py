@@ -1,20 +1,19 @@
-from fastapi import APIRouter, Request, HTTPException, status
-from infrastructure.shared.constants.application_constants import (
-    ApplicationConstants
-)
+from fastapi import APIRouter, Depends
+
+from application.use_cases.health import HealthCheckUseCase
+from webapi.dependencies import get_health_use_case, get_settings
+from webapi.settings import Settings
 
 router = APIRouter()
 
+
 @router.get("/health")
-async def health(request: Request):
-
-    if not request.app.state.started:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Application not started"
-        )
-
-    return {
-        "service": ApplicationConstants.SERVICE_NAME,
-        "status": "healthy"
-    }
+async def health(
+    use_case: HealthCheckUseCase = Depends(get_health_use_case),
+    settings: Settings = Depends(get_settings),
+):
+    """Returns the current health status of the application."""
+    result = use_case.execute()
+    result["service"] = settings.service_name
+    result["environment"] = settings.environment
+    return result

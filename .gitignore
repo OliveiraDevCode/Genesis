@@ -19,6 +19,10 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
+.env
+.env.production
+.env.*.local
+
 dist/
 build/
 *.egg-info/
