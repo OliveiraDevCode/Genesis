@@ -1,9 +1,5 @@
-from application.interfaces.telemetry import TelemetryPort
-
-
 class HealthCheckUseCase:
-
-    def __init__(self, telemetry: TelemetryPort) -> None:
+    def __init__(self, telemetry) -> None:
         self._telemetry = telemetry
 
     def execute(self) -> dict:

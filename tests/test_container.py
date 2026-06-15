@@ -1,27 +1,23 @@
-from webapi.container import Container
-from webapi.settings import Settings
+from application.health import HealthCheckUseCase
+from infrastructure.telemetry import TelemetryService
+from webapi.main import create_app
 
 
-def test_container_creates_without_error():
-    container = Container.create()
-
-    assert isinstance(container, Container)
-    assert isinstance(container.settings, Settings)
-    assert container.telemetry_service is not None
-    assert container.health_use_case is not None
+def test_create_app_succeeds():
+    app = create_app()
+    assert app.title is not None
 
 
-def test_container_returns_frozen_dataclass():
-    container = Container.create()
-
-    try:
-        container.settings = Settings()
-        assert False
-    except Exception:
-        pass
+def test_create_app_wires_telemetry():
+    app = create_app()
+    assert isinstance(app.state.telemetry, TelemetryService)
 
 
-def test_container_health_use_case_has_telemetry():
-    container = Container.create()
+def test_create_app_wires_health_use_case():
+    app = create_app()
+    assert isinstance(app.state.health_use_case, HealthCheckUseCase)
 
-    assert container.health_use_case._telemetry is container.telemetry_service
+
+def test_create_app_shares_telemetry_instance():
+    app = create_app()
+    assert app.state.health_use_case._telemetry is app.state.telemetry
