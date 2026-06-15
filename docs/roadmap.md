@@ -1,18 +1,14 @@
-## Phase 0 - Backend Foundation
+# Genesis
 
-Status: Completed
+## Phase 0 - Foundation
 
-Topics:
-- Project structure
-- FastAPI
-- Routing
-- Lifespan
-- Logging
-- OpenTelemetry
-- Health checks
+The initial foundation of Genesis.
 
-Deliverables:
-- Running HTTP API
-- Health endpoint
-- Startup/shutdown lifecycle
-- Telemetry foundation
+* FastAPI backend application
+* Health endpoint (`GET /health`)
+* OpenTelemetry tracing
+* Application startup and shutdown lifecycle
+* Basic automated test suite
+* Clean project structure with separation between application, infrastructure, and web layers
+
+This phase establishes the technical foundation that future Genesis features will build upon.
